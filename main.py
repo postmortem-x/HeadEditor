@@ -177,7 +177,7 @@ class MainWindow(QtWidgets.QWidget):
         self.head_data = ()
         self.head_data_copy = ()
 
-        self.setFixedSize(800, 600)
+        self.setFixedSize(700, 600)
         self.setWindowTitle('HeadEditor')
         self.center()
 
@@ -461,7 +461,7 @@ class MainWindow(QtWidgets.QWidget):
                 self.axes.add_collection3d(Poly3DCollection(vertices, facecolors=color + 'ff', zorder=0))
 
             for k in range(0, len(self.x_)):
-                self.axes.text3D(self.x_[k], self.z_[k], self.y_[k], str(k), color='black', fontsize=5, alpha=0.75,
+                self.axes.text3D(self.x_[k], self.z_[k], self.y_[k], str(k), color='black', fontsize=5, alpha=0.7,
                                  zorder=50)
 
         self.canvas.draw_idle()
