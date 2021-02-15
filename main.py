@@ -1,7 +1,6 @@
 import struct
-from PyQt4 import QtGui
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
 import matplotlib.figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
@@ -161,7 +160,7 @@ faces = {
 face_keys = faces.keys()
 
 
-class MainWindow(QtGui.QWidget):
+class MainWindow(QtWidgets.QWidget):
     def __init__(self):
         super(MainWindow, self).__init__()
 
@@ -182,66 +181,66 @@ class MainWindow(QtGui.QWidget):
         self.setWindowTitle('HeadEditor')
         self.center()
 
-        main_layout = QtGui.QHBoxLayout()
-        layout_left = QtGui.QVBoxLayout()
+        main_layout = QtWidgets.QHBoxLayout()
+        layout_left = QtWidgets.QVBoxLayout()
 
         self.figure = matplotlib.figure.Figure()  # Plot
         self.canvas = FigureCanvas(self.figure)
         self.axes = Axes3D(self.figure)
 
-        group_box = QGroupBox("Editing:")
+        group_box = QtWidgets.QGroupBox("Editing:")
 
-        self.cb = QComboBox()
+        self.cb = QtWidgets.QComboBox()
         self.cb.currentIndexChanged.connect(self.select_change)
 
         slider_lim = 128
         slider_interval = 32
 
-        self.x_slider = QSlider(Qt.Horizontal)
+        self.x_slider = QtWidgets.QSlider(Qt.Horizontal)
         self.x_slider.valueChanged.connect(self.x_slider_change)
         self.x_slider.setMinimum(-slider_lim)
         self.x_slider.setMaximum(slider_lim)
-        self.x_slider.setTickPosition(QSlider.TicksBelow)
+        self.x_slider.setTickPosition(QtWidgets.QSlider.TicksBelow)
         self.x_slider.setTickInterval(slider_interval)
         self.x_slider.setEnabled(False)
 
-        self.y_slider = QSlider(Qt.Horizontal)
+        self.y_slider = QtWidgets.QSlider(Qt.Horizontal)
         self.y_slider.valueChanged.connect(self.y_slider_change)
         self.y_slider.setMinimum(-slider_lim)
         self.y_slider.setMaximum(slider_lim)
-        self.y_slider.setTickPosition(QSlider.TicksBelow)
+        self.y_slider.setTickPosition(QtWidgets.QSlider.TicksBelow)
         self.y_slider.setTickInterval(slider_interval)
         self.y_slider.setEnabled(False)
 
-        self.z_slider = QSlider(Qt.Horizontal)
+        self.z_slider = QtWidgets.QSlider(Qt.Horizontal)
         self.z_slider.valueChanged.connect(self.z_slider_change)
         self.z_slider.setMinimum(-slider_lim)
         self.z_slider.setMaximum(slider_lim)
-        self.z_slider.setTickPosition(QSlider.TicksBelow)
+        self.z_slider.setTickPosition(QtWidgets.QSlider.TicksBelow)
         self.z_slider.setTickInterval(slider_interval)
         self.z_slider.setEnabled(False)
 
-        self.expression_slider = QSlider(Qt.Horizontal)
+        self.expression_slider = QtWidgets.QSlider(Qt.Horizontal)
         self.expression_slider.valueChanged.connect(self.expression_slider_change)
         self.expression_slider.setMinimum(0)
         self.expression_slider.setMaximum(4)
         self.expression_slider.setValue(0)
-        self.expression_slider.setTickPosition(QSlider.TicksBelow)
+        self.expression_slider.setTickPosition(QtWidgets.QSlider.TicksBelow)
         self.expression_slider.setTickInterval(1)
         self.expression_slider.setEnabled(False)
 
-        self.load_button = QtGui.QPushButton('Load', self)
+        self.load_button = QtWidgets.QPushButton('Load', self)
         self.load_button.clicked.connect(self.load_data)
 
-        self.save_button = QtGui.QPushButton('Save', self)
+        self.save_button = QtWidgets.QPushButton('Save', self)
         self.save_button.clicked.connect(self.save_data)
 
-        self.x_slider_label = QLabel("x : 0")
-        self.y_slider_label = QLabel("y : 0")
-        self.z_slider_label = QLabel("z : 0")
-        self.exp_slider_label = QLabel("Expression : 1")
+        self.x_slider_label = QtWidgets.QLabel("x : 0")
+        self.y_slider_label = QtWidgets.QLabel("y : 0")
+        self.z_slider_label = QtWidgets.QLabel("z : 0")
+        self.exp_slider_label = QtWidgets.QLabel("Expression : 1")
 
-        hbox = QVBoxLayout()
+        hbox = QtWidgets.QVBoxLayout()
         hbox.addWidget(self.x_slider_label)
         hbox.addWidget(self.x_slider)
         hbox.addWidget(self.y_slider_label)
@@ -254,7 +253,7 @@ class MainWindow(QtGui.QWidget):
         hbox.addWidget(self.save_button)
         hbox.addStretch(1)
 
-        allitems = QVBoxLayout()
+        allitems = QtWidgets.QVBoxLayout()
         allitems.addWidget(self.cb)
         allitems.addLayout(hbox)
 
@@ -306,36 +305,41 @@ class MainWindow(QtGui.QWidget):
     def load_data(self):
 
         points = []
-        filename = QFileDialog.getOpenFileName(self, 'Open file',
-                                               'c:\\', "DAT file (*.dat)")
+        filename = QtWidgets.QFileDialog.getOpenFileName(self, 'Open file', 'c:\\', "DAT file (*.dat)")
 
         if filename != '':
 
-            f = open(filename, 'rb')
-            f.seek(0, os.SEEK_END)
-            self.size = f.tell()
+            f = open(filename[0], 'rb')
 
-            head, tail = os.path.split(str(filename))
-            self.current_full_filename = str(filename)
-            self.current_filename = tail
+            try:
 
-            if 660 <= self.size <= 930 and self.size % 30 == 0 and tail.lower() in face_keys:
+                f.seek(0, os.SEEK_END)
+                self.size = f.tell()
 
-                f.seek(0, 0)
+                head, tail = os.path.split(str(filename[0]))
+                self.current_full_filename = str(filename[0])
+                self.current_filename = tail
 
-                with f:
-                    while 1:
-                        input_stream = f.read(2)
-                        if not input_stream:
-                            f.close()
-                            break
-                        points.append(struct.unpack('<h', input_stream)[0])
+                if 660 <= self.size <= 930 and self.size % 30 == 0 and tail.lower() in face_keys:
+
+                    f.seek(0, 0)
+
+                    with f:
+                        while 1:
+                            input_stream = f.read(2)
+                            if not input_stream:
+                                f.close()
+                                break
+                            points.append(struct.unpack('<h', input_stream)[0])
+
+            finally:
+                f.close()
 
                 points_x = []
                 points_y = []
                 points_z = []
 
-                for n in range(0, len(points) / 3):
+                for n in range(0, int(len(points) / 3)):
                     points_x.append(points[3 * n])
                     points_y.append(points[3 * n + 1])
                     points_z.append(points[3 * n + 2])
@@ -347,13 +351,13 @@ class MainWindow(QtGui.QWidget):
                 self.load_face()
                 self.plot_3d()
 
-            else:
+        else:
 
-                self.show_dialog()
+            self.show_dialog()
 
     def update_data(self):
 
-        points_per_head = self.size / (5 * 2 * 3)
+        points_per_head = int(self.size / (5 * 2 * 3))
         start = self.expression_index * points_per_head
 
         self.head_data[0][start + self.point_index] = self.x_slider.value()
@@ -365,7 +369,7 @@ class MainWindow(QtGui.QWidget):
 
     def load_face(self):
 
-        points_per_head = self.size / (5 * 2 * 3)
+        points_per_head = int(self.size / (5 * 2 * 3))
         start = self.expression_index * points_per_head
         stop = start + points_per_head
 
@@ -381,16 +385,16 @@ class MainWindow(QtGui.QWidget):
         if self.cb.count() > 0:
             self.cb.clear()
 
-        for k in range(0, points_per_head):
+        for k in range(0, int(points_per_head)):
             self.cb.addItem('Point ' + str(k))
 
     @staticmethod
     def show_dialog():
-        msg = QMessageBox()
-        msg.setIcon(QMessageBox.Warning)
+        msg = QtWidgets.QMessageBox()
+        msg.setIcon(QtWidgets.QMessageBox.Warning)
         msg.setText("Unknown file or wrong filename.")
         msg.setWindowTitle("File Loading Error")
-        msg.setStandardButtons(QMessageBox.Ok)
+        msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
         msg.exec_()
 
     def save_data(self):
@@ -464,13 +468,13 @@ class MainWindow(QtGui.QWidget):
 
     def center(self):
         qr = self.frameGeometry()
-        cp = QtGui.QDesktopWidget().availableGeometry().center()
+        cp = QtWidgets.QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
 
 if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
