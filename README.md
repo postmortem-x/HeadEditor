@@ -1,5 +1,5 @@
 # HeadEditor
-Head Editor for the game 4d Sports Boxing, updated version.
+Updated Head Editor for the game 4d Sports Boxing.
 
 Requires Python 3.9 & PyQt5.
 
